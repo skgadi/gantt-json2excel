@@ -1,0 +1,29 @@
+{
+  "name": "gantt-json2excel",
+  "version": "1.0.0",
+  "description": "A utility to convert Gantt JSON data to Excel format.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "gantt",
+    "json",
+    "excel",
+    "converter"
+  ],
+  "author": "Suresh Kumar Gadi <email@skgadi.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/skgadi/gantt-json2excel.git"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.1",
+    "typescript": "^5.7.2"
+  },
+  "dependencies": {
+    "exceljs": "^4.4.0",
+    "moment": "^2.30.1"
+  }
+}
