@@ -1,6 +1,6 @@
 {
   "name": "gantt-json2excel",
-  "version": "1.0.6",
+  "version": "1.0.8",
   "description": "A utility to convert Gantt JSON data to Excel format.",
   "main": "dist/index.js", 
   "module": "dist/index.js", 

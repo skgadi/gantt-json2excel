@@ -194,7 +194,7 @@ export async function ganttToExcel(
 
       // Define columns for Excel sheet
       sheet.columns = [
-        { header: "Task", key: "task", width: 30 },
+        { header: "Task", key: "task", width: 55 },
         { header: "Start", key: "start", width: 15 },
         { header: "End", key: "end", width: 15 },
         ...Array.from({ length: noOfDays }, (_, i) => {
@@ -208,8 +208,8 @@ export async function ganttToExcel(
       const dataToAdd = data.map((row) => {
         return {
           task: row.task,
-          start: moment(row.start).format("YYYY-MM-DD"),
-          end: moment(row.end).format("YYYY-MM-DD"),
+          start: row.start ? moment(row.start).format("YYYY-MM-DD") : null,
+          end: row.end ? moment(row.end).format("YYYY-MM-DD") : null,
         };
       });
 
@@ -273,12 +273,13 @@ export async function ganttToExcel(
         const end = moment(row.end).toDate();
         const startDiff = moment(start).diff(moment(limits.min), "days");
         const endDiff = moment(end).diff(moment(limits.min), "days");
+        const barColor = row.color?.argb || options?.defaultColor || "FF0000";
         for (let j = startDiff; j <= endDiff; j++) {
           sheet.getCell(i + 3, j + 4).fill = {
             type: "pattern",
             pattern: "solid",
             fgColor: {
-              argb: row.color?.argb || options?.defaultColor || "FF0000",
+              argb: barColor,
             },
           };
           // put thick border around all the cells
@@ -287,23 +288,33 @@ export async function ganttToExcel(
             bottom: { style: borderStyle },
           };
         }
-
-        // put thick border around the first and last cell
-        sheet.getCell(i + 3, startDiff + 4).border = {
-          top: { style: borderStyle },
-          left: { style: borderStyle },
-          bottom: { style: borderStyle },
-        };
-        sheet.getCell(i + 3, endDiff + 4).border = {
-          top: { style: borderStyle },
-          bottom: { style: borderStyle },
-          right: { style: borderStyle },
-        };
+        if (startDiff === endDiff) {
+          sheet.getCell(i + 3, startDiff + 4).border = {
+            top: { style: borderStyle },
+            bottom: { style: borderStyle },
+            left: { style: borderStyle },
+            right: { style: borderStyle },
+          };
+        } else {
+          // put thick border around the first and last cell
+          sheet.getCell(i + 3, startDiff + 4).border = {
+            top: { style: borderStyle },
+            left: { style: borderStyle },
+            bottom: { style: borderStyle },
+          };
+          sheet.getCell(i + 3, endDiff + 4).border = {
+            top: { style: borderStyle },
+            bottom: { style: borderStyle },
+            right: { style: borderStyle },
+          };
+        }
       }
 
       // insert a row if there exists a title or subtitle
+      let noOfRowsToFreeze: number = 2;
       if (inSheet.title || inSheet.subTitle) {
         sheet.insertRow(1, { task: "" });
+        noOfRowsToFreeze = 3;
       }
 
       // add the title and subtitle
@@ -313,6 +324,7 @@ export async function ganttToExcel(
         sheet.getCell(1, 4 + noOfDays).alignment = { horizontal: "left" };
         // Set bold and font size to the title
         sheet.getCell(1, 1).font = { bold: true, size: 16 };
+        noOfRowsToFreeze++;
       }
       if (inSheet.subTitle) {
         sheet.insertRow(2, { task: inSheet.subTitle });
@@ -320,7 +332,17 @@ export async function ganttToExcel(
         sheet.getCell(2, 4 + noOfDays).alignment = { horizontal: "left" };
         // Set bold and font size to the subtitle
         sheet.getCell(2, 1).font = { bold: true, size: 14 };
+        noOfRowsToFreeze++;
       }
+
+      // Freeze the first few rows
+      sheet.views = [
+        {
+          state: "frozen",
+          xSplit: 1,
+          ySplit: noOfRowsToFreeze,
+        },
+      ];
     });
 
     // Write to file

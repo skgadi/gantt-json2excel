@@ -21,7 +21,7 @@ const sheets = [
     data: [
       { task: "Task 1", start: "2024-01-01", end: "2024-02-07" },
       { task: "Task 2", start: "2024-03-06", end: "2024-02-12" },
-      { task: "Task 3", start: "2024-01-11", end: "2024-03-15" },
+      { task: "Task 3", start: "2024-01-11", end: null },
     ],
     title: "Sample Gantt Chart 2",
   },
