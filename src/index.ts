@@ -43,23 +43,23 @@
 import * as ExcelJS from "exceljs";
 import moment from "moment";
 
-interface GSK_SHEET_DETAILS {
+export interface GSK_SHEET_DETAILS {
   sheetName: string;
   title?: string;
   subTitle?: string;
   data: GSK_GANTT_TASK[];
 }
 
-interface GSK_GANTT_TASK {
+export interface GSK_GANTT_TASK {
   task: string;
-  start: string;
-  end: string;
+  start: string | Date | null | undefined;
+  end: string | Date | null | undefined;
   color?: {
     argb: string;
   };
 }
 
-interface GSK_GANTT_OPTIONS {
+export interface GSK_GANTT_OPTIONS {
   leftPadding?: number;
   rightPadding?: number;
   minDaysForMonth?: number;
@@ -68,14 +68,14 @@ interface GSK_GANTT_OPTIONS {
   borderStyle?: "thick" | "thin" | "double";
 }
 
-interface GSK_META {
+export interface GSK_META {
   outputFileName?: string;
   author?: string;
   title?: string;
   subTitle?: string;
 }
 
-interface GSK_GANTT_OUTPUT {
+export interface GSK_GANTT_OUTPUT {
   buffer?: ExcelJS.Buffer;
   returnCode: number; // 0 for success, 1 for failure due to no data, 2 for failure due to other reasons
   errorMessage?: string;
@@ -134,6 +134,9 @@ export async function ganttToExcel(
       // Get min and max dates
       const limits: { min: Date; max: Date } = data.reduce(
         (acc, row) => {
+          if (!row.start || !row.end) {
+            return acc;
+          }
           let start = moment(row.start).toDate();
           let end = moment(row.end).toDate();
           if (start > end) {
@@ -262,6 +265,10 @@ export async function ganttToExcel(
       // add the task color
       for (let i = 0; i < data.length; i++) {
         const row = data[i];
+        if (!row.start || !row.end) {
+          continue;
+        }
+
         const start = moment(row.start).toDate();
         const end = moment(row.end).toDate();
         const startDiff = moment(start).diff(moment(limits.min), "days");
