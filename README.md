@@ -23,7 +23,7 @@ Here’s how you can use `gantt-json2excel`:
 ### Example
 
 ```javascript
-import { ganttToExcel } from "../index";
+import { ganttToExcel } from "gantt-json2excel";
 
 const sheets = [
   {
